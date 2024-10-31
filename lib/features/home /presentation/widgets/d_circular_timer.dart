@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-import '../../../../core/util/constants/color_grid.dart';
-
 class DCircularTimer extends StatefulWidget {
   final int durationInSeconds;
-  final int remainingTime;
   final Color color;
 
   const DCircularTimer({
     super.key,
     required this.durationInSeconds,
-    required this.remainingTime,
     this.color = Colors.blue,
   });
 
@@ -19,8 +15,7 @@ class DCircularTimer extends StatefulWidget {
   DCircularTimerState createState() => DCircularTimerState();
 }
 
-class DCircularTimerState extends State<DCircularTimer>
-    with SingleTickerProviderStateMixin {
+class DCircularTimerState extends State<DCircularTimer> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -34,65 +29,47 @@ class DCircularTimerState extends State<DCircularTimer>
       vsync: this,
       duration: Duration(seconds: widget.durationInSeconds),
     );
-    _controller.value = widget.remainingTime / widget.durationInSeconds;
 
-    // Listen for timer completion
+    // Notify when timer completes
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _showCompletionDialog();
+        if (mounted && widget.durationInSeconds > 0) {
+          // Notify HomeScreen that the timer has completed
+          if (widget.key is GlobalKey<DCircularTimerState>) {
+            final parentKey = widget.key as GlobalKey<DCircularTimerState>;
+            parentKey.currentState?.onTimerComplete();
+          }
+        }
       }
     });
   }
 
-  void _showCompletionDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: tWhite,
-          title: const Text("Time's up!"),
-          content: const Text("The timer has completed."),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-              child: const Text("Dismiss"),
-            ),
-            TextButton(
-              onPressed: () {
-                reset(); // Reset the timer
-                Navigator.of(context).pop();
-              },
-              child: const Text("Reset"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Update progress based on new remaining time
-  void updateProgress(int remainingTime) {
-    setState(() {
-      _controller.value = remainingTime / widget.durationInSeconds;
-    });
-  }
-
-  void start() {
-    if (!_controller.isAnimating && !_controller.isCompleted) {
-      _controller.reverse(from: _controller.value);
+  void onTimerComplete() {
+    if (mounted) {
+      // Notify parent about timer completion
+      if (widget.key is GlobalKey<DCircularTimerState>) {
+        final parentKey = widget.key as GlobalKey<DCircularTimerState>;
+        parentKey.currentState?.onTimerComplete();
+      }
     }
+  }
+
+  // Public methods to control the timer
+  void start() {
+    _controller.forward(from: 0);
   }
 
   void pause() {
-    if (_controller.isAnimating) {
-      _controller.stop();
-    }
+    _controller.stop();
   }
 
   void reset() {
+    _controller.reset();
+  }
+
+  void updateDuration(int newDurationInSeconds) {
+    _controller.stop();
+    _controller.duration = Duration(seconds: newDurationInSeconds);
     _controller.reset();
   }
 
@@ -108,7 +85,6 @@ class DCircularTimerState extends State<DCircularTimer>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background black circle
           CustomPaint(
             size: const Size(700, 700),
             painter: BackgroundCirclePainter(),
@@ -119,7 +95,7 @@ class DCircularTimerState extends State<DCircularTimer>
               return CustomPaint(
                 size: const Size(500, 500),
                 painter: PieChartPainter(
-                  progress: _controller.value,
+                  progress: 1 - _controller.value,
                   color: widget.color,
                 ),
               );
@@ -131,12 +107,11 @@ class DCircularTimerState extends State<DCircularTimer>
   }
 }
 
-// Painter for the black background circle
 class BackgroundCirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint backgroundPaint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
+      ..color = Colors.black.withOpacity(0.0)
       ..style = PaintingStyle.fill;
 
     Offset center = Offset(size.width / 2, size.height / 2);

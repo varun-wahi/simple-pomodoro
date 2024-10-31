@@ -1,16 +1,17 @@
 # simple_pomodoro
 
-A new Flutter project.
+An Open-source widget library for creative widgets. Help me improve the code
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+<h2>Terminal commands</h2>
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<code>flutter pub add riverpod
+flutter pub add flutter_riverpod
+flutter pub add font_awesome_flutter
+flutter pub add smooth_page_indicator
+flutter pub add shared_preferences
+flutter pub add hive
+flutter pub add google_fonts
+flutter pub add go_router
+flutter pub add hive_flutter</code>

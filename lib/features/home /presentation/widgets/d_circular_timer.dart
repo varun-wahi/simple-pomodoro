@@ -3,14 +3,15 @@ import 'dart:math';
 
 import '../../../../core/util/constants/color_grid.dart';
 
-
 class DCircularTimer extends StatefulWidget {
   final int durationInSeconds;
+  final int remainingTime;
   final Color color;
 
   const DCircularTimer({
     super.key,
-    this.durationInSeconds = 10,
+    required this.durationInSeconds,
+    required this.remainingTime,
     this.color = Colors.blue,
   });
 
@@ -18,16 +19,22 @@ class DCircularTimer extends StatefulWidget {
   DCircularTimerState createState() => DCircularTimerState();
 }
 
-class DCircularTimerState extends State<DCircularTimer> with SingleTickerProviderStateMixin {
+class DCircularTimerState extends State<DCircularTimer>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
+    _initializeController();
+  }
+
+  void _initializeController() {
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: widget.durationInSeconds),
     );
+    _controller.value = widget.remainingTime / widget.durationInSeconds;
 
     // Listen for timer completion
     _controller.addStatusListener((status) {
@@ -40,7 +47,7 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
   void _showCompletionDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dialog from closing by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: tWhite,
@@ -56,7 +63,7 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
             TextButton(
               onPressed: () {
                 reset(); // Reset the timer
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
               },
               child: const Text("Reset"),
             ),
@@ -66,16 +73,16 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
     );
   }
 
-
-  void updateDuration(int newDurationInSeconds) {
-    _controller.stop();
-    _controller.duration = Duration(seconds: newDurationInSeconds);
-    _controller.reset();
+  // Update progress based on new remaining time
+  void updateProgress(int remainingTime) {
+    setState(() {
+      _controller.value = remainingTime / widget.durationInSeconds;
+    });
   }
 
   void start() {
     if (!_controller.isAnimating && !_controller.isCompleted) {
-      _controller.forward();
+      _controller.reverse(from: _controller.value);
     }
   }
 
@@ -106,19 +113,19 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
             size: const Size(700, 700),
             painter: BackgroundCirclePainter(),
           ),
-          
           AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return CustomPaint(
-              size: const Size(500, 500),
-              painter: PieChartPainter(
-                progress: 1 - _controller.value,
-                color: widget.color,
-              ),
-            );
-          },
-        ),]
+            animation: _controller,
+            builder: (context, child) {
+              return CustomPaint(
+                size: const Size(500, 500),
+                painter: PieChartPainter(
+                  progress: _controller.value,
+                  color: widget.color,
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

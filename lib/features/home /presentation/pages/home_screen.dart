@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_pomodoro/features/home%20/presentation/widgets/d_circular_timer.dart';
+import 'package:simple_pomodoro/features/home%20/presentation/widgets/round_button.dart';
 
 import '../../../../core/util/widgets/d_gap.dart'; // Update this import path
 
@@ -183,15 +184,15 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildRoundButton(
+              RoundButton(
                 icon: Icons.refresh,
                 onPressed: isEditing ? null : _resetTimer,
               ),
-              _buildRoundButton(
+              RoundButton(
                 icon: isPaused ? Icons.play_arrow : Icons.pause,
                 onPressed: isEditing ? null : _startOrPauseTimer,
               ),
-              _buildRoundButton(
+              RoundButton(
                 icon: Icons.edit,
                 onPressed: _editTimer,
                 selected: isEditing,
@@ -211,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: controller,
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
-        style: TextStyle(fontSize: 35, color: Colors.black),
+        style: const TextStyle(fontSize: 35, color: Colors.black),
         decoration: InputDecoration(
           hintText: hint,
           border: OutlineInputBorder(
@@ -224,22 +225,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRoundButton({
-    required IconData icon,
-    required VoidCallback? onPressed,
-    bool selected = false,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16.0),
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: selected ? Colors.black : Colors.grey.withOpacity(0.2),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: selected ? Colors.white : Colors.black, size: 40),
-      ),
-    );
-  }
 }

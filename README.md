@@ -5,6 +5,7 @@ An Open-source widget library for creative widgets. Help me improve the code
 
 
 <h2>Terminal commands</h2>
+<p>RUN BEFORE RUNNING APPLICATION</p>
 
 <code>flutter pub add riverpod
 flutter pub add flutter_riverpod

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_pomodoro/config/router/route_constants.dart';
 import 'package:simple_pomodoro/features/auth/presentation/pages/login_screen.dart';
+import 'package:simple_pomodoro/features/home%20/presentation/pages/analytics_screen.dart';
 import 'package:simple_pomodoro/features/home%20/presentation/pages/home_screen.dart';
 import 'package:simple_pomodoro/features/settings/presentation/pages/settings_page.dart';
 
@@ -31,6 +32,14 @@ class AppRouter {
               path: '/settings',
               pageBuilder: (context, state) {
                 return const MaterialPage(child: MoreOptionsPage());
+              },
+            ),
+
+            GoRoute(
+              name: RouteConstants.analytics,
+              path: '/analytics',
+              pageBuilder: (context, state) {
+                return const MaterialPage(child: AnalyticsScreen());
               },
             ),
           ],

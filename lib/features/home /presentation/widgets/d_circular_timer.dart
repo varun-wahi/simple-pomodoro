@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:simple_pomodoro/core/util/constants/color_grid.dart';
+
 class DCircularTimer extends StatefulWidget {
   final int durationInSeconds;
-  final Color color;
+  final Color fgColor;
+  final Color bgColor;
+
 
   const DCircularTimer({
     super.key,
     required this.durationInSeconds,
-    this.color = Colors.blue,
+    this.fgColor = Colors.blue,
+    this.bgColor = tBlack,
   });
 
   @override
@@ -29,44 +34,29 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
       vsync: this,
       duration: Duration(seconds: widget.durationInSeconds),
     );
-
-    // Notify when timer completes
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (mounted && widget.durationInSeconds > 0) {
-          // Notify HomeScreen that the timer has completed
-          if (widget.key is GlobalKey<DCircularTimerState>) {
-            final parentKey = widget.key as GlobalKey<DCircularTimerState>;
-            parentKey.currentState?.onTimerComplete();
-          }
-        }
-      }
-    });
   }
 
-  void onTimerComplete() {
-    if (mounted) {
-      // Notify parent about timer completion
-      if (widget.key is GlobalKey<DCircularTimerState>) {
-        final parentKey = widget.key as GlobalKey<DCircularTimerState>;
-        parentKey.currentState?.onTimerComplete();
-      }
+  // Public method to start/resume the timer
+  void start() {
+    if (_controller.isDismissed || _controller.isCompleted) {
+      _controller.duration = Duration(seconds: widget.durationInSeconds); // Reset duration if completed
+    }
+    _controller.forward(from: _controller.value); // Resume from current position
+  }
+
+  // Public method to pause the timer
+  void pause() {
+    if (_controller.isAnimating) {
+      _controller.stop();
     }
   }
 
-  // Public methods to control the timer
-  void start() {
-    _controller.forward(from: 0);
-  }
-
-  void pause() {
-    _controller.stop();
-  }
-
+  // Public method to reset the timer
   void reset() {
     _controller.reset();
   }
 
+  // Method to update duration without resetting the progress
   void updateDuration(int newDurationInSeconds) {
     _controller.stop();
     _controller.duration = Duration(seconds: newDurationInSeconds);
@@ -96,7 +86,7 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
                 size: const Size(500, 500),
                 painter: PieChartPainter(
                   progress: 1 - _controller.value,
-                  color: widget.color,
+                  color: widget.fgColor,
                 ),
               );
             },
@@ -107,11 +97,12 @@ class DCircularTimerState extends State<DCircularTimer> with SingleTickerProvide
   }
 }
 
+// Painter for the black background circle
 class BackgroundCirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint backgroundPaint = Paint()
-      ..color = Colors.black.withOpacity(0.0)
+      ..color = Colors.black.withOpacity(0.8)
       ..style = PaintingStyle.fill;
 
     Offset center = Offset(size.width / 2, size.height / 2);

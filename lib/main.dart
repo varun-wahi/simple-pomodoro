@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:simple_pomodoro/config/theme/dark_theme.dart';
 import 'package:simple_pomodoro/config/theme/light_theme.dart';
 
 import 'config/router/router.dart';
@@ -24,7 +25,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Simple Pomodoro',
-      theme: lightTheme,
+      // theme: lightTheme,
+      theme: darkTheme,
       routerConfig: appRouter.router,
     );
   }
